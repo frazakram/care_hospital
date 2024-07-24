@@ -8,8 +8,13 @@ app = Flask(__name__)
 columns = ['Patient ID', 'Patient Name', 'Diseases', 'Days Stayed', 'Doctor Name']
 patients_df = pd.DataFrame(columns=columns)
 
+# List of doctors
+doctors = ['Dr.Mahera Erum', 'Dr.Irfan Anwar']
+
 def add_patient(name, diseases, days_stayed, doctor):
     global patients_df
+    if doctor not in doctors:
+        return None
     patient_id = str(uuid.uuid4())  # Generate a unique patient ID
     new_patient = pd.DataFrame([{
         'Patient ID': patient_id,
@@ -55,7 +60,10 @@ def index():
             days_stayed = int(request.form['days_stayed'])
             doctor = request.form['doctor']
             patient_id = add_patient(name, diseases, days_stayed, doctor)
-            return redirect(url_for('index', patient_id=patient_id))
+            if patient_id:
+                return redirect(url_for('index', patient_id=patient_id))
+            else:
+                return render_template('index.html', error="Invalid doctor name.")
         elif 'patient_id' in request.form and 'name' in request.form:
             patient_name = request.form['name']
             patient_id = request.form['patient_id']
@@ -73,7 +81,10 @@ def add_patient_route():
     days_stayed = int(request.form['days_stayed'])
     doctor = request.form['doctor']
     patient_id = add_patient(name, diseases, days_stayed, doctor)
-    return redirect(url_for('index', patient_id=patient_id))
+    if patient_id:
+        return redirect(url_for('index', patient_id=patient_id))
+    else:
+        return render_template('index.html', error="Invalid doctor name.")
 
 @app.route('/generate_bill', methods=['POST'])
 def generate_bill_route():
