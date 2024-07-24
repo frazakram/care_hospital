@@ -25,11 +25,15 @@ def calculate_bill(diseases, days_stayed):
     total_sum = sum(diseases.values()) * days_stayed
     return total_sum
 
-def generate_bill(patient_id):
+def generate_bill(patient_name, patient_id):
     global patients_df
-    if patient_id not in patients_df['Patient ID'].values:
+    patient = patients_df[
+        (patients_df['Patient Name'] == patient_name) &
+        (patients_df['Patient ID'] == patient_id)
+    ]
+    if patient.empty:
         return None
-    patient = patients_df[patients_df['Patient ID'] == patient_id].iloc[0]
+    patient = patient.iloc[0]
     total_sum = calculate_bill(patient['Diseases'], patient['Days Stayed'])
     
     return {
@@ -42,8 +46,9 @@ def generate_bill(patient_id):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global patients_df
     if request.method == 'POST':
-        if 'name' in request.form:
+        if 'name' in request.form and 'diseases' in request.form:
             name = request.form['name']
             diseases_str = request.form['diseases']
             diseases = {d.split(':')[0]: float(d.split(':')[1]) for d in diseases_str.split(',')}
@@ -51,13 +56,14 @@ def index():
             doctor = request.form['doctor']
             patient_id = add_patient(name, diseases, days_stayed, doctor)
             return redirect(url_for('index', patient_id=patient_id))
-        elif 'patient_id' in request.form:
+        elif 'patient_id' in request.form and 'name' in request.form:
+            patient_name = request.form['name']
             patient_id = request.form['patient_id']
-            bill = generate_bill(patient_id)
-            if bill is None:
-                return render_template('index.html', bill=None, error="Patient not found.")
-            return render_template('index.html', bill=bill, error=None)
-    return render_template('index.html', bill=None, error=None)
+            bill_context = generate_bill(patient_name, patient_id)
+            if bill_context is None:
+                return render_template('index.html', bill="Patient not found.", error="Patient not found.")
+            return render_template('index.html', **bill_context, error=None)
+    return render_template('index.html', bill=None, error=None, patients=patients_df.to_dict(orient='records'))
 
 @app.route('/add_patient', methods=['POST'])
 def add_patient_route():
@@ -71,8 +77,9 @@ def add_patient_route():
 
 @app.route('/generate_bill', methods=['POST'])
 def generate_bill_route():
+    patient_name = request.form['name']
     patient_id = request.form['patient_id']
-    bill_context = generate_bill(patient_id)
+    bill_context = generate_bill(patient_name, patient_id)
     if bill_context is None:
         return render_template('bill.html', bill="Patient not found.")
     return render_template('bill.html', **bill_context)

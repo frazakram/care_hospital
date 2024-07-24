@@ -59,6 +59,21 @@
             margin-bottom: 15px;
             text-align: center;
         }
+        .patient-list {
+            margin-top: 20px;
+        }
+        .patient-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .patient-list th, .patient-list td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .patient-list th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -81,7 +96,10 @@
         </form>
 
         <form action="/generate_bill" method="post">
-            <label for="patient_id">Patient ID for Bill:</label>
+            <label for="name">Patient Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="patient_id">Patient ID:</label>
             <input type="text" id="patient_id" name="patient_id" required>
 
             <button type="submit">Generate Bill</button>
@@ -97,6 +115,31 @@
         {% if error %}
         <div class="error">{{ error }}</div>
         {% endif %}
+
+        <!-- Displaying patient details -->
+        <div class="patient-list">
+            <h2>Patient Details</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient ID</th>
+                        <th>Patient Name</th>
+                        <th>Doctor Name</th>
+                        <th>Days Stayed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                    <tr>
+                        <td>{{ patient['Patient ID'] }}</td>
+                        <td>{{ patient['Patient Name'] }}</td>
+                        <td>{{ patient['Doctor Name'] }}</td>
+                        <td>{{ patient['Days Stayed'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>
