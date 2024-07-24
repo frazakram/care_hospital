@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        .bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .bill-header div {
+            font-size: 18px;
+            color: #666;
+        }
+        .bill-details {
+            margin-bottom: 20px;
+        }
+        .bill-details h2 {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .bill-details p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .bill-table th, .bill-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .bill-table th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .bill-total {
+            text-align: right;
+            font-size: 18px;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hospital Bill</h1>
+        <div class="bill-header">
+            <div>Patient Name: {{ patient_name }}</div>
+            <div>Doctor: {{ doctor_name }}</div>
+        </div>
+        <div class="bill-details">
+            <h2>Bill Details</h2>
+            <p>Days Stayed: {{ days_stayed }}</p>
+            <p>Diseases and Charges:</p>
+            <table class="bill-table">
+                <thead>
+                    <tr>
+                        <th>Disease</th>
+                        <th>Charge (in ₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for disease, price in diseases.items() %}
+                    <tr>
+                        <td>{{ disease }}</td>
+                        <td>{{ price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="bill-total">Total Amount: ₹{{ total_sum }}</p>
+        </div>
+        <button onclick="window.print()">Print Bill</button>
+    </div>
+</body>
+</html>
